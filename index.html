@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CardioGuard AI - Heart Disease Prevention & Prediction System</title>
+  <meta name="description" content="AI-Powered Cardiovascular Disease Prevention, ML Risk Assessment & Clinical Healthcare Management Platform">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div id="app">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="brand-header">
+      <div class="brand-logo-icon">💓</div>
+      <div class="brand-title">Cardio<span>Guard</span> AI</div>
+    </div>
+
+    <ul class="nav-menu">
+      <li class="nav-item">
+        <button data-view="dashboard" class="active">
+          <span>📊</span> Health Dashboard
+        </button>
+      </li>
+      <li class="nav-item">
+        <button data-view="assessment">
+          <span>📋</span> AI Risk Assessment
+        </button>
+      </li>
+      <li class="nav-item">
+        <button data-view="xai">
+          <span>🧬</span> Explainable AI (XAI)
+        </button>
+      </li>
+      <li class="nav-item">
+        <button data-view="simulator">
+          <span>🎛️</span> "What-If" Risk Simulator
+        </button>
+      </li>
+      <li class="nav-item">
+        <button data-view="prevention">
+          <span>🛡️</span> Preventive Care Plan
+        </button>
+      </li>
+      <li class="nav-item">
+        <button data-view="medications">
+          <span>⏰</span> Medication Reminders
+        </button>
+      </li>
+      <li class="nav-item" id="nav-doctor-roster" style="display:none;">
+        <button data-view="roster">
+          <span>🩺</span> Doctor Patient Roster
+        </button>
+      </li>
+    </ul>
+
+    <div class="user-profile-badge">
+      <div class="avatar" id="user-avatar-initials">RT</div>
+      <div class="user-info">
+        <div class="user-name" id="current-user-name">Robert Thorne</div>
+        <div class="user-role" id="current-user-role">Patient</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Workspace -->
+  <div class="main-wrapper">
+    <!-- Top Navigation Bar -->
+    <header class="top-bar">
+      <div class="page-title">
+        <h1 id="header-title">Cardiovascular Health Dashboard</h1>
+      </div>
+
+      <div class="top-actions">
+        <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; color:var(--text-muted);">
+          <span>Role View:</span>
+          <select id="user-role-select" class="form-control" style="padding:0.35rem 0.6rem; font-size:0.85rem;">
+            <option value="patient">Patient Access</option>
+            <option value="doctor">Doctor (Cardiologist MD)</option>
+          </select>
+        </div>
+
+        <span class="badge badge-patient" id="role-badge">Patient Access</span>
+        <button class="btn btn-primary" onclick="CardioApp.printClinicalReport()">
+          🖨️ Export Clinical PDF
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Panels -->
+    <main class="content-area">
+
+      <!-- VIEW 1: DASHBOARD -->
+      <section id="view-dashboard" class="view-panel">
+        <!-- Overview Risk Gauge -->
+        <div class="card risk-overview-card" style="margin-bottom: 1.5rem;">
+          <div class="risk-score-circle high" id="dash-score-circle">
+            <span class="score-value" id="dash-score-val">78%</span>
+            <span class="score-label">10-Yr Risk</span>
+          </div>
+
+          <div class="risk-details">
+            <div class="risk-badge-large high" id="dash-risk-badge">High Cardiovascular Risk (78%)</div>
+            <h2 style="font-size: 1.3rem; margin-bottom: 0.4rem;" id="dash-patient-name">Robert Thorne</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+              Based on ACC/AHA machine learning risk classification & clinical parameters. High priority for therapeutic intervention and dietary lifestyle modifications.
+            </p>
+          </div>
+        </div>
+
+        <!-- Metrics Cards Grid -->
+        <div class="grid-4" style="margin-bottom: 1.5rem;">
+          <div class="card">
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Resting Blood Pressure</div>
+            <div style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; color: #f43f5e; margin-top: 0.3rem;" id="metric-bp">154/96 mmHg</div>
+            <div style="font-size: 0.75rem; color: #ef4444; margin-top: 0.2rem;">Stage 2 Hypertension</div>
+          </div>
+
+          <div class="card">
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Total Cholesterol</div>
+            <div style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; color: #f59e0b; margin-top: 0.3rem;" id="metric-chol">265 mg/dL</div>
+            <div style="font-size: 0.75rem; color: #f59e0b; margin-top: 0.2rem;">High Serum Lipids</div>
+          </div>
+
+          <div class="card">
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Body Mass Index (BMI)</div>
+            <div style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; color: #14b8a6; margin-top: 0.3rem;" id="metric-bmi">29.8 kg/m²</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Overweight Range</div>
+          </div>
+
+          <div class="card">
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Peak Exercise HR</div>
+            <div style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; color: #3b82f6; margin-top: 0.3rem;" id="metric-hr">138 bpm</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Sub-target Peak HR</div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid-2">
+          <div class="card">
+            <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Longitudinal Risk Trajectory</h3>
+            <div style="height: 260px;">
+              <canvas id="chart-risk-history"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Top Key Risk Driving Factors (XAI)</h3>
+            <div style="height: 260px;">
+              <canvas id="chart-top-drivers"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: RISK ASSESSMENT FORM -->
+      <section id="view-assessment" class="view-panel" style="display:none;">
+        <div class="card">
+          <h2 style="font-size: 1.25rem; margin-bottom: 1.5rem; color: var(--primary-red);">AI Cardiovascular Risk Assessment Input</h2>
+          <form id="risk-assessment-form">
+            <div class="grid-3">
+              <div class="form-group">
+                <label>Full Patient Name</label>
+                <input type="text" id="input-name" class="form-control" value="Robert Thorne" required>
+              </div>
+
+              <div class="form-group">
+                <label>Age (years)</label>
+                <input type="number" id="input-age" class="form-control" value="58" required>
+              </div>
+
+              <div class="form-group">
+                <label>Biological Gender</label>
+                <select id="input-gender" class="form-control">
+                  <option value="male" selected>Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Systolic Blood Pressure (mmHg)</label>
+                <input type="number" id="input-sys-bp" class="form-control" value="154" required>
+              </div>
+
+              <div class="form-group">
+                <label>Diastolic Blood Pressure (mmHg)</label>
+                <input type="number" id="input-dia-bp" class="form-control" value="96" required>
+              </div>
+
+              <div class="form-group">
+                <label>Serum Total Cholesterol (mg/dL)</label>
+                <input type="number" id="input-cholesterol" class="form-control" value="265" required>
+              </div>
+
+              <div class="form-group">
+                <label>Fasting Blood Sugar (mg/dL)</label>
+                <input type="number" id="input-fbs" class="form-control" value="135" required>
+              </div>
+
+              <div class="form-group">
+                <label>Body Mass Index (BMI kg/m²)</label>
+                <input type="number" step="0.1" id="input-bmi" class="form-control" value="29.8" required>
+              </div>
+
+              <div class="form-group">
+                <label>Max Exercise Heart Rate (bpm)</label>
+                <input type="number" id="input-max-hr" class="form-control" value="138" required>
+              </div>
+
+              <div class="form-group">
+                <label>Tobacco / Smoking Habit</label>
+                <select id="input-smoking" class="form-control">
+                  <option value="never">Never Smoked</option>
+                  <option value="former">Former Smoker</option>
+                  <option value="heavy" selected>Active Smoker</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Weekly Aerobic Exercise (Days)</label>
+                <input type="number" min="0" max="7" id="input-exercise" class="form-control" value="1" required>
+              </div>
+
+              <div class="form-group">
+                <label>First-Degree Family CAD History</label>
+                <select id="input-family-history" class="form-control">
+                  <option value="yes" selected>Yes (Present)</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Chest Pain Symptom Type</label>
+                <select id="input-chest-pain" class="form-control">
+                  <option value="0">Asymptomatic</option>
+                  <option value="1" selected>Typical Angina</option>
+                  <option value="2">Atypical Angina</option>
+                  <option value="3">Non-anginal Pain</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Exercise-Induced Angina</label>
+                <select id="input-ex-angina" class="form-control">
+                  <option value="yes" selected>Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>ECG ST Depression (Oldpeak mm)</label>
+                <input type="number" step="0.1" id="input-oldpeak" class="form-control" value="1.8" required>
+              </div>
+            </div>
+
+            <div style="margin-top: 1.5rem; text-align: right;">
+              <button type="submit" class="btn btn-primary" style="padding: 0.8rem 2rem;">
+                🧠 Run AI Machine Learning Risk Engine
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- VIEW 3: EXPLAINABLE AI (XAI) -->
+      <section id="view-xai" class="view-panel" style="display:none;">
+        <div class="card">
+          <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem; color: var(--accent-teal);">Explainable AI (XAI) - SHAP Feature Attribution</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+            Breakdown of exact risk drivers pushing the patient's predicted score up (+%) versus protective lifestyle factors (-%).
+          </p>
+
+          <div id="xai-factors-list" class="xai-factors-list">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: WHAT-IF SIMULATOR -->
+      <section id="view-simulator" class="view-panel" style="display:none;">
+        <div class="grid-2">
+          <div class="card">
+            <h2 style="font-size: 1.2rem; margin-bottom: 1rem; color: var(--accent-teal);">Interactive Risk Factor Controls</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
+              Adjust target parameters below to simulate how lifestyle modifications directly impact predicted 5-year cardiovascular risk score in real-time.
+            </p>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <span>Systolic Blood Pressure</span>
+                <span class="slider-val" id="val-sim-bp">154 mmHg</span>
+              </div>
+              <input type="range" id="sim-bp" min="90" max="190" value="154">
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <span>Serum Total Cholesterol</span>
+                <span class="slider-val" id="val-sim-chol">265 mg/dL</span>
+              </div>
+              <input type="range" id="sim-chol" min="130" max="320" value="265">
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <span>Smoking Habit</span>
+                <span class="slider-val" id="val-sim-smoke">HEAVY</span>
+              </div>
+              <select id="sim-smoke" class="form-control">
+                <option value="never">Never Smoked</option>
+                <option value="former">Former Smoker</option>
+                <option value="heavy" selected>Active Heavy Smoker</option>
+              </select>
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <span>Weekly Exercise Days</span>
+                <span class="slider-val" id="val-sim-exercise">1 days/wk</span>
+              </div>
+              <input type="range" id="sim-exercise" min="0" max="7" value="1">
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <span>Body Mass Index (BMI)</span>
+                <span class="slider-val" id="val-sim-bmi">29.8 kg/m²</span>
+              </div>
+              <input type="range" id="sim-bmi" min="18" max="40" step="0.5" value="29.8">
+            </div>
+          </div>
+
+          <div class="card" style="display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+            <div style="font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Baseline Risk Score</div>
+            <div style="font-family: var(--font-display); font-size: 2.8rem; font-weight: 700; color: #ef4444; margin-bottom: 1.5rem;" id="sim-base-score">78%</div>
+
+            <div style="font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Simulated Target Risk</div>
+            <div style="font-family: var(--font-display); font-size: 3.5rem; font-weight: 800; color: #10b981; margin-bottom: 1rem;" id="sim-new-score">34%</div>
+
+            <div id="sim-delta" style="font-size: 1.3rem; font-weight: 700; color: #10b981; background: rgba(16,185,129,0.15); padding: 0.5rem 1.5rem; border-radius: var(--radius-full);">
+              -44% Risk Reduction!
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: PREVENTIVE CARE PLAN -->
+      <section id="view-prevention" class="view-panel" style="display:none;">
+        <div class="grid-2" style="margin-bottom: 1.5rem;">
+          <div class="card">
+            <h3 style="font-size: 1.1rem; margin-bottom: 1rem; color: var(--accent-teal);">🥗 Customized Dietary & Nutrition Guidelines</h3>
+            <div id="plan-diet-list"></div>
+          </div>
+
+          <div class="card">
+            <h3 style="font-size: 1.1rem; margin-bottom: 1rem; color: var(--risk-medium);">🏃 Target Zone Aerobic Exercise Prescription</h3>
+            <div id="plan-exercise-list"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size: 1.1rem; margin-bottom: 1rem; color: var(--primary-red);">🩺 Recommended Clinical Health Checkups & Intervals</h3>
+          <div id="plan-checkups-list"></div>
+        </div>
+      </section>
+
+      <!-- VIEW 6: MEDICATION REMINDERS -->
+      <section id="view-medications" class="view-panel" style="display:none;">
+        <div class="card">
+          <h2 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--accent-teal);">Daily Cardiovascular Medication Tracker</h2>
+          <div id="medication-list"></div>
+        </div>
+      </section>
+
+      <!-- VIEW 7: DOCTOR ROSTER -->
+      <section id="view-roster" class="view-panel" style="display:none;">
+        <div class="card">
+          <h2 style="font-size: 1.25rem; margin-bottom: 1rem; color: #60a5fa;">Patient Roster & Risk Stratification</h2>
+          <div class="custom-table-container">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Patient Name</th>
+                  <th>Age / Sex</th>
+                  <th>Blood Pressure</th>
+                  <th>Cholesterol</th>
+                  <th>AI Risk Category</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="doctor-patient-tbody">
+                <!-- Dynamically rendered -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- Modal: Doctor Notes -->
+<div class="modal-overlay" id="doctor-notes-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Clinical Notes - <span id="modal-patient-name">Patient</span></h3>
+      <button class="modal-close" onclick="CardioApp.closeDoctorModal()">&times;</button>
+    </div>
+    <input type="hidden" id="modal-patient-id">
+    <div class="form-group">
+      <label>Cardiologist Diagnostic Notes & Action Plan</label>
+      <textarea id="modal-notes-textarea" class="form-control" rows="5" placeholder="Enter clinical notes, prescribed dosage adjustments, and consultation summaries..."></textarea>
+    </div>
+    <div style="text-align: right; margin-top: 1rem;">
+      <button class="btn btn-secondary" onclick="CardioApp.closeDoctorModal()" style="margin-right:0.5rem;">Cancel</button>
+      <button class="btn btn-primary" onclick="CardioApp.saveDoctorNotes()">Save Clinical Notes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Scripts -->
+<script src="js/ml_engine.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
